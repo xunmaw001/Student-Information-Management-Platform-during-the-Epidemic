@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.WenjianbiaoDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.wenjianbiao_name as wenjianbiaoName
+        ,a.wenjianbiao_uuid_number as wenjianbiaoUuidNumber
+        ,a.wenjianbiao_photo as wenjianbiaoPhoto
+        ,a.wenjianbiao_file as wenjianbiaoFile
+        ,a.zan_number as zanNumber
+        ,a.cai_number as caiNumber
+        ,a.wenjianbiao_types as wenjianbiaoTypes
+        ,a.wenjianbiao_content as wenjianbiaoContent
+        ,a.shangxia_types as shangxiaTypes
+        ,a.wenjianbiao_delete as wenjianbiaoDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.WenjianbiaoView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM wenjianbiao  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.wenjianbiaoName != '' and params.wenjianbiaoName != null and params.wenjianbiaoName != 'null' ">
+                and a.wenjianbiao_name like CONCAT('%',#{params.wenjianbiaoName},'%')
+            </if>
+            <if test=" params.wenjianbiaoUuidNumber != '' and params.wenjianbiaoUuidNumber != null and params.wenjianbiaoUuidNumber != 'null' ">
+                and a.wenjianbiao_uuid_number like CONCAT('%',#{params.wenjianbiaoUuidNumber},'%')
+            </if>
+            <if test="params.zanNumberStart != null and params.zanNumberStart != ''">
+                <![CDATA[  and a.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null and params.zanNumberEnd != ''">
+                <![CDATA[  and a.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+             <if test="params.zanNumber != null and params.zanNumber != ''">
+                and a.zan_number = #{params.zanNumber}
+             </if>
+            <if test="params.caiNumberStart != null and params.caiNumberStart != ''">
+                <![CDATA[  and a.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null and params.caiNumberEnd != ''">
+                <![CDATA[  and a.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+             <if test="params.caiNumber != null and params.caiNumber != ''">
+                and a.cai_number = #{params.caiNumber}
+             </if>
+            <if test="params.wenjianbiaoTypes != null and params.wenjianbiaoTypes != ''">
+                and a.wenjianbiao_types = #{params.wenjianbiaoTypes}
+            </if>
+            <if test=" params.wenjianbiaoContent != '' and params.wenjianbiaoContent != null and params.wenjianbiaoContent != 'null' ">
+                and a.wenjianbiao_content like CONCAT('%',#{params.wenjianbiaoContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null and params.shangxiaTypes != ''">
+                and a.shangxia_types = #{params.shangxiaTypes}
+            </if>
+            <if test="params.wenjianbiaoDeleteStart != null and params.wenjianbiaoDeleteStart != ''">
+                <![CDATA[  and a.wenjianbiao_delete >= #{params.wenjianbiaoDeleteStart}   ]]>
+            </if>
+            <if test="params.wenjianbiaoDeleteEnd != null and params.wenjianbiaoDeleteEnd != ''">
+                <![CDATA[  and a.wenjianbiao_delete <= #{params.wenjianbiaoDeleteEnd}   ]]>
+            </if>
+             <if test="params.wenjianbiaoDelete != null and params.wenjianbiaoDelete != ''">
+                and a.wenjianbiao_delete = #{params.wenjianbiaoDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.WenjianbiaoCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.wenjianbiao_id as wenjianbiaoId
+        ,a.xuesheng_id as xueshengId
+        ,a.wenjianbiao_collection_types as wenjianbiaoCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.WenjianbiaoCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,wenjianbiao.wenjianbiao_name as wenjianbiaoName
+        ,wenjianbiao.wenjianbiao_uuid_number as wenjianbiaoUuidNumber
+        ,wenjianbiao.wenjianbiao_photo as wenjianbiaoPhoto
+        ,wenjianbiao.wenjianbiao_file as wenjianbiaoFile
+        ,wenjianbiao.zan_number as zanNumber
+        ,wenjianbiao.cai_number as caiNumber
+        ,wenjianbiao.wenjianbiao_types as wenjianbiaoTypes
+        ,wenjianbiao.wenjianbiao_content as wenjianbiaoContent
+        ,wenjianbiao.shangxia_types as shangxiaTypes
+        ,wenjianbiao.wenjianbiao_delete as wenjianbiaoDelete
+        ,xuesheng.xuesheng_name as xueshengName
+        ,xuesheng.xuesheng_phone as xueshengPhone
+        ,xuesheng.xuesheng_id_number as xueshengIdNumber
+        ,xuesheng.xuesheng_photo as xueshengPhoto
+        ,xuesheng.xueyuan_types as xueyuanTypes
+        ,xuesheng.banji_types as banjiTypes
+        ,xuesheng.xuesheng_email as xueshengEmail
+        ,xuesheng.jinyong_types as jinyongTypes
+
+        FROM wenjianbiao_collection  a
+        left JOIN wenjianbiao wenjianbiao ON a.wenjianbiao_id = wenjianbiao.id
+        left JOIN xuesheng xuesheng ON a.xuesheng_id = xuesheng.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.wenjianbiaoId != null and params.wenjianbiaoId != ''">
+                and (
+                    a.wenjianbiao_id = #{params.wenjianbiaoId}
+                )
+            </if>
+            <if test="params.xueshengId != null and params.xueshengId != ''">
+                and (
+                    a.xuesheng_id = #{params.xueshengId}
+                )
+            </if>
+            <if test="params.wenjianbiaoCollectionTypes != null and params.wenjianbiaoCollectionTypes != ''">
+                and a.wenjianbiao_collection_types = #{params.wenjianbiaoCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断学校文件的id不为空 -->
+            <if test=" params.wenjianbiaoIdNotNull != '' and params.wenjianbiaoIdNotNull != null and params.wenjianbiaoIdNotNull != 'null' ">
+                and a.wenjianbiao_id IS NOT NULL
+            </if>
+            <if test=" params.wenjianbiaoName != '' and params.wenjianbiaoName != null and params.wenjianbiaoName != 'null' ">
+                and wenjianbiao.wenjianbiao_name like CONCAT('%',#{params.wenjianbiaoName},'%')
+            </if>
+            <if test=" params.wenjianbiaoUuidNumber != '' and params.wenjianbiaoUuidNumber != null and params.wenjianbiaoUuidNumber != 'null' ">
+                and wenjianbiao.wenjianbiao_uuid_number like CONCAT('%',#{params.wenjianbiaoUuidNumber},'%')
+            </if>
+            <if test="params.zanNumberStart != null  and params.zanNumberStart != '' ">
+                <![CDATA[  and wenjianbiao.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null  and params.zanNumberEnd != '' ">
+                <![CDATA[  and wenjianbiao.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+            <if test="params.zanNumber != null  and params.zanNumber != '' ">
+                and wenjianbiao.zan_number = #{params.zanNumber}
+            </if>
+            <if test="params.caiNumberStart != null  and params.caiNumberStart != '' ">
+                <![CDATA[  and wenjianbiao.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null  and params.caiNumberEnd != '' ">
+                <![CDATA[  and wenjianbiao.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+            <if test="params.caiNumber != null  and params.caiNumber != '' ">
+                and wenjianbiao.cai_number = #{params.caiNumber}
+            </if>
+            <if test="params.wenjianbiaoTypes != null  and params.wenjianbiaoTypes != ''">
+                and wenjianbiao.wenjianbiao_types = #{params.wenjianbiaoTypes}
+            </if>
+
+            <if test=" params.wenjianbiaoContent != '' and params.wenjianbiaoContent != null and params.wenjianbiaoContent != 'null' ">
+                and wenjianbiao.wenjianbiao_content like CONCAT('%',#{params.wenjianbiaoContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and wenjianbiao.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.wenjianbiaoDeleteStart != null  and params.wenjianbiaoDeleteStart != '' ">
+                <![CDATA[  and wenjianbiao.wenjianbiao_delete >= #{params.wenjianbiaoDeleteStart}   ]]>
+            </if>
+            <if test="params.wenjianbiaoDeleteEnd != null  and params.wenjianbiaoDeleteEnd != '' ">
+                <![CDATA[  and wenjianbiao.wenjianbiao_delete <= #{params.wenjianbiaoDeleteEnd}   ]]>
+            </if>
+            <if test="params.wenjianbiaoDelete != null  and params.wenjianbiaoDelete != '' ">
+                and wenjianbiao.wenjianbiao_delete = #{params.wenjianbiaoDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(wenjianbiao.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(wenjianbiao.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断学生的id不为空 -->
+            <if test=" params.xueshengIdNotNull != '' and params.xueshengIdNotNull != null and params.xueshengIdNotNull != 'null' ">
+                and a.xuesheng_id IS NOT NULL
+            </if>
+            <if test=" params.xueshengName != '' and params.xueshengName != null and params.xueshengName != 'null' ">
+                and xuesheng.xuesheng_name like CONCAT('%',#{params.xueshengName},'%')
+            </if>
+            <if test=" params.xueshengPhone != '' and params.xueshengPhone != null and params.xueshengPhone != 'null' ">
+                and xuesheng.xuesheng_phone like CONCAT('%',#{params.xueshengPhone},'%')
+            </if>
+            <if test=" params.xueshengIdNumber != '' and params.xueshengIdNumber != null and params.xueshengIdNumber != 'null' ">
+                and xuesheng.xuesheng_id_number like CONCAT('%',#{params.xueshengIdNumber},'%')
+            </if>
+            <if test="params.xueyuanTypes != null  and params.xueyuanTypes != ''">
+                and xuesheng.xueyuan_types = #{params.xueyuanTypes}
+            </if>
+
+            <if test="params.banjiTypes != null  and params.banjiTypes != ''">
+                and xuesheng.banji_types = #{params.banjiTypes}
+            </if>
+
+            <if test=" params.xueshengEmail != '' and params.xueshengEmail != null and params.xueshengEmail != 'null' ">
+                and xuesheng.xuesheng_email like CONCAT('%',#{params.xueshengEmail},'%')
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and xuesheng.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

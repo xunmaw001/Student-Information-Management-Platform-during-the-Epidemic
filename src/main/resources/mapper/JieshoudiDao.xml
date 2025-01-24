@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JieshoudiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.jieshoudi_uuid_number as jieshoudiUuidNumber
+        ,a.jieshoudi_name as jieshoudiName
+        ,a.jieshoudi_address as jieshoudiAddress
+        ,a.jieshoudi_types as jieshoudiTypes
+        ,a.jieshoudi_content as jieshoudiContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JieshoudiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM jieshoudi  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.jieshoudiUuidNumber != '' and params.jieshoudiUuidNumber != null and params.jieshoudiUuidNumber != 'null' ">
+                and a.jieshoudi_uuid_number like CONCAT('%',#{params.jieshoudiUuidNumber},'%')
+            </if>
+            <if test=" params.jieshoudiName != '' and params.jieshoudiName != null and params.jieshoudiName != 'null' ">
+                and a.jieshoudi_name like CONCAT('%',#{params.jieshoudiName},'%')
+            </if>
+            <if test=" params.jieshoudiAddress != '' and params.jieshoudiAddress != null and params.jieshoudiAddress != 'null' ">
+                and a.jieshoudi_address like CONCAT('%',#{params.jieshoudiAddress},'%')
+            </if>
+            <if test="params.jieshoudiTypes != null and params.jieshoudiTypes != ''">
+                and a.jieshoudi_types = #{params.jieshoudiTypes}
+            </if>
+            <if test=" params.jieshoudiContent != '' and params.jieshoudiContent != null and params.jieshoudiContent != 'null' ">
+                and a.jieshoudi_content like CONCAT('%',#{params.jieshoudiContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
